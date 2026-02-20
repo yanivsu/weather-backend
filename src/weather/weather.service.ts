@@ -1,4 +1,6 @@
-import { Injectable, HttpException, HttpStatus } from "@nestjs/common";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { Injectable, HttpException, HttpStatus, Inject } from "@nestjs/common";
+import { Cache } from "cache-manager";
 import axios from "axios";
 
 const WMO_CODES: Record<number, string> = {
@@ -57,6 +59,8 @@ const WMO_ICONS: Record<number, string> = {
 
 @Injectable()
 export class WeatherService {
+  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
+
   private async geocode(
     city: string,
   ): Promise<{ lat: number; lon: number; name: string; country: string }> {
@@ -78,6 +82,15 @@ export class WeatherService {
   }
 
   async getWeather(city: string = "Haifa") {
+    const cacheKey = `weather_${city.toLowerCase()}`;
+    console.log("Checking cache for:", cacheKey);
+    const cached = await this.cacheManager.get(cacheKey);
+
+    if (cached) {
+      console.log("Returning cached data for:", cacheKey);
+      return cached;
+    }
+
     const location = await this.geocode(city);
     console.log("Calling geocode for:", city);
     console.log("Calling weather API for:", location);

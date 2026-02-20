@@ -1,11 +1,15 @@
-import { Controller, Get, Query, UseGuards, Optional } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import { ApiTags, ApiOperation, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
-import { WeatherService } from './weather.service';
-import { AiService } from './ai.service';
+import { Controller, Get, Query, UseGuards, Optional } from "@nestjs/common";
+import {
+  ApiTags,
+  ApiOperation,
+  ApiQuery,
+  ApiBearerAuth,
+} from "@nestjs/swagger";
+import { WeatherService } from "./weather.service";
+import { AiService } from "./ai.service";
 
-@ApiTags('Weather')
-@Controller('weather')
+@ApiTags("Weather")
+@Controller("weather")
 export class WeatherController {
   constructor(
     private weatherService: WeatherService,
@@ -13,21 +17,31 @@ export class WeatherController {
   ) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get weather data for a city' })
-  @ApiQuery({ name: 'city', required: false, description: 'City name (default: Haifa)' })
-  async getWeather(@Query('city') city: string = 'Haifa') {
+  @ApiOperation({ summary: "Get weather data for a city" })
+  @ApiQuery({
+    name: "city",
+    required: false,
+    description: "City name (default: Haifa)",
+  })
+  async getWeather(@Query("city") city: string = "Haifa") {
     const weatherData = await this.weatherService.getWeather(city);
     return weatherData;
   }
 
-  @Get('summary')
-  @ApiOperation({ summary: 'Get AI-generated weather summary + clothing recommendation' })
-  @ApiQuery({ name: 'city', required: false, description: 'City name (default: Haifa)' })
-  async getWeatherWithSummary(@Query('city') city: string = 'Haifa') {
+  @Get("summary")
+  @ApiOperation({
+    summary: "Get AI-generated weather summary + clothing recommendation",
+  })
+  @ApiQuery({
+    name: "city",
+    required: false,
+    description: "City name (default: Haifa)",
+  })
+  async getWeatherWithSummary(@Query("city") city: string = "Haifa") {
     const weatherData = await this.weatherService.getWeather(city);
     const aiSummary = await this.aiService.getWeatherSummary(weatherData);
     return {
-      ...weatherData,
+      ...(weatherData as any),
       aiSummary,
     };
   }
