@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import axios from 'axios';
+import { Injectable } from "@nestjs/common";
+import axios from "axios";
 
 @Injectable()
 export class AiService {
@@ -27,22 +27,22 @@ export class AiService {
     try {
       // Try OpenRouter first (free tier available)
       const apiKey = process.env.OPENROUTER_API_KEY;
-      
-      if (apiKey && apiKey !== 'your_openrouter_api_key_here') {
+
+      if (apiKey && apiKey !== "your_openrouter_api_key_here") {
         const response = await axios.post(
-          'https://openrouter.ai/api/v1/chat/completions',
+          "https://openrouter.ai/api/v1/chat/completions",
           {
-            model: 'mistralai/mistral-7b-instruct:free',
-            messages: [{ role: 'user', content: prompt }],
+            model: "mistralai/mistral-7b-instruct:free",
+            messages: [{ role: "user", content: prompt }],
             max_tokens: 300,
           },
           {
             headers: {
               Authorization: `Bearer ${apiKey}`,
-              'Content-Type': 'application/json',
-              'HTTP-Referer': 'http://localhost:3000',
+              "Content-Type": "application/json",
+              "HTTP-Referer": "http://localhost:3000",
             },
-          }
+          },
         );
 
         const content = response.data.choices[0].message.content;
@@ -52,7 +52,7 @@ export class AiService {
         return this.generateFallbackSummary(weatherData);
       }
     } catch (error) {
-      console.error('AI service error:', error.message);
+      console.error("AI service error:", error.message);
       return this.generateFallbackSummary(weatherData);
     }
   }
@@ -65,13 +65,15 @@ export class AiService {
     const temp = current.temperature;
     const isHot = temp > 28;
     const isCold = temp < 15;
-    const isRainy = [51,53,55,61,63,65,80,81,82].includes(current.weatherCode);
+    const isRainy = [51, 53, 55, 61, 63, 65, 80, 81, 82].includes(
+      current.weatherCode,
+    );
 
-    let clothing = '';
-    if (isRainy) clothing = '☂️ קח מטרייה ומעיל עמיד למים!';
-    else if (isHot) clothing = '👕 לבוש קל ונוח, אל תשכח קרם הגנה!';
-    else if (isCold) clothing = '🧥 שכבות חמות מומלצות, מעיל חובה!';
-    else clothing = '👔 לבוש נוח ונייטרלי, טמפרטורה נעימה!';
+    let clothing = "";
+    if (isRainy) clothing = "☂️ קח מטרייה ומעיל עמיד למים!";
+    else if (isHot) clothing = "👕 לבוש קל ונוח, אל תשכח קרם הגנה!";
+    else if (isCold) clothing = "🧥 שכבות חמות מומלצות, מעיל חובה!";
+    else clothing = "👔 לבוש נוח ונייטרלי, טמפרטורה נעימה!";
 
     return {
       today: `כיום ב${location.name} ${current.description} עם ${current.temperature}°C. הטמפרטורות ינועו בין ${today.minTemp}° ל-${today.maxTemp}°.`,
